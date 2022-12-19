@@ -30,12 +30,35 @@ public class UsersController {
         return usersRepository.findAll();
     }
 
+
+    @PostMapping("/users")
+    public ResponseEntity<String> createUser(@RequestParam String name, HttpServletRequest request,
+                                     UriComponentsBuilder uriComponentsBuilder) throws Exception{
+        try{
+            logger.info("Recibiendo datos de request");
+            UsersEntity entity = new UsersEntity();
+            entity.setName(name);
+            entity.setLastName(request.getParameter("lastName"));
+            entity.setEmail(request.getParameter("email"));
+            entity.setPassword(request.getParameter("password"));
+
+            logger.info("Insetando datos de request");
+            usersRepository.save(entity);
+            logger.info("Registro creado");
+
+            return new ResponseEntity<>("Usuario Creado",HttpStatus.ACCEPTED);
+        }catch(Exception e){
+            logger.error("Ha ocurrido un error al insertar datos...");
+            return new ResponseEntity<>("Usuario No Creado",HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
     @DeleteMapping("/users/email/{email}")
     public ResponseEntity<String> deleteUserByEmail(@PathVariable String email){
         logger.info("Iniciando proceso de borrado de usuario");
         logger.info("Buscando registros para " + email);
         try{
-            UsersEntity user = usersRepository.findByEmail("pablo.prezparedes@outlook.com");
+            UsersEntity user = usersRepository.findByEmail(email);
             usersRepository.delete(user);
             logger.info("Borrado de usuario exitoso");
             return new ResponseEntity<>("Registro eliminado correctamente", HttpStatus.OK);
@@ -92,25 +115,4 @@ public class UsersController {
 
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<String> createUser(@RequestParam String name, HttpServletRequest request,
-                                     UriComponentsBuilder uriComponentsBuilder) throws Exception{
-        try{
-            logger.info("Recibiendo datos de request");
-            UsersEntity entity = new UsersEntity();
-            entity.setName(name);
-            entity.setLastName(request.getParameter("lastName"));
-            entity.setEmail(request.getParameter("email"));
-            entity.setPassword(request.getParameter("password"));
-
-            logger.info("Insetando datos de request");
-            usersRepository.save(entity);
-            logger.info("Registro creado");
-
-            return new ResponseEntity<>("Usuario Creado",HttpStatus.ACCEPTED);
-        }catch(Exception e){
-            logger.error("Ha ocurrido un error al insertar datos...");
-            return new ResponseEntity<>("Usuario No Creado",HttpStatus.NOT_ACCEPTABLE);
-        }
-    }
 }
