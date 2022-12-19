@@ -1,7 +1,6 @@
 package org.bedu.backend.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.catalina.User;
 import org.bedu.backend.entities.UsersEntity;
 import org.bedu.backend.repositories.IUsersRepository;
 import org.slf4j.Logger;
@@ -29,6 +28,28 @@ public class UsersController {
     @GetMapping("/users")
     public List<UsersEntity> getUsers(){
         return usersRepository.findAll();
+    }
+
+    @DeleteMapping("/users/email/{email}")
+    public ResponseEntity<String> deleteUserByEmail(@PathVariable String email){
+        logger.info("Iniciando proceso de borrado de usuario");
+        logger.info("Buscando registros para " + email);
+        try{
+            UsersEntity user = usersRepository.findByEmail("pablo.prezparedes@outlook.com");
+            usersRepository.delete(user);
+            logger.info("Borrado de usuario exitoso");
+            return new ResponseEntity<>("Registro eliminado correctamente", HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>("Registro no eliminado correctamente", HttpStatus.NOT_MODIFIED);
+        }
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id){
+        logger.info("Iniciando proceso de borrado de usuario");
+        usersRepository.deleteById(id);
+        logger.info("Borrado de usuario exitoso");
+        return new ResponseEntity<>("Registro eliminado correctamente", HttpStatus.OK);
     }
 
     @PatchMapping("/users/{id}")
